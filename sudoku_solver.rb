@@ -87,12 +87,9 @@ def do_trivial_solution(allowed_numbers_in_space,joined_puzzle)
 end
 
 def do_nontrivial_solution(allowed_numbers_in_space,joined_puzzle)
-	# puts "ran nontrivial"
 	smallest_set = allowed_numbers_in_space.map { |x| 
 		x.class==Array ? x.size : 10
 	}.min
-	# p allowed_numbers_sizes.min
-	# nontrivial_solution_counter=0
 	allowed_numbers_in_space.each_index do |nth_space|
 		this_space_solutions = allowed_numbers_in_space[nth_space]
 		if joined_puzzle[nth_space] ==0 &&
