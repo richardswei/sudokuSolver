@@ -97,7 +97,6 @@ def do_nontrivial_solution(allowed_numbers_in_space,joined_puzzle)
 	# nontrivial_solution_counter=0
 	allowed_numbers_in_space.each_index do |nth_space|
 		this_space_solutions = allowed_numbers_in_space[nth_space]
-		
 		if this_space_solutions.class==Array &&
 			this_space_solutions.size==smallest_set
 			this_space_solutions.each do |element_in_set|
@@ -106,19 +105,22 @@ def do_nontrivial_solution(allowed_numbers_in_space,joined_puzzle)
 				find_next_state(joined_puzzle.flatten)
 			end
 		end
+		if this_space_solutions.size==smallest_set
+			break
+		end
 	end
 end
 
 sudoku_solver([
-	[0,0,0,0,0,0,0,0,6],
-	[0,0,0,0,0,7,1,2,4],
-	[0,0,0,0,6,0,0,5,9],
-	[0,0,8,4,7,9,2,6,1],
-	[0,0,9,0,0,0,4,0,5],
-	[0,2,4,6,0,0,9,8,7],
-	[0,5,2,9,1,0,6,4,8],
-	[0,8,0,0,0,0,0,0,0],
-	[0,4,1,7,8,0,0,0,0]
+	[0,0,0,3,0,4,5,0,0],
+	[4,7,0,0,0,0,0,0,0],
+	[0,2,0,6,0,0,9,1,0],
+	[0,1,0,0,0,0,8,0,0],
+	[0,0,8,0,1,0,3,9,0],
+	[0,3,0,0,6,9,0,0,0],
+	[0,0,0,0,0,7,0,0,5],
+	[0,0,0,0,0,0,2,0,7],
+	[1,0,0,0,0,0,0,8,0],
 ])
 # solution
 # [4, 9, 3, 2, 5, 1, 8, 7, 6,
