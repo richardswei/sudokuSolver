@@ -19,14 +19,6 @@ def find_next_state(base_puzzle)
 	base_puzzle.each_index do |nth_space|
 		square_puzzle[nth_space/9].push(base_puzzle[nth_space])
 	end
-	# This is a recursion so we should check if we already found a solution
-	if base_puzzle.map{|x| x>0?1:0}.sum==81
-		puts "solution" 
-		square_puzzle.each do |row|
-			p row
-		end
-		return 1
-	end
 
 	# We reorganize the puzzle so we can have unique sets to check against
 	sorted_by_rank = square_puzzle
@@ -43,50 +35,61 @@ def find_next_state(base_puzzle)
 		end
 	end
 
-	# If none of the spaces have an obvious one step solution run the nontrivial method else trivial
-	# if allowed_numbers_in_space.map{|x| x.size==1?1:0}.sum==0
-	# 	# p allowed_numbers_in_space
-	# 	do_nontrivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,base_puzzle)
-	# else
-	# 	do_trivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,base_puzzle)
-	# end
-end
+	# This is a recursion so we should check if we already found a solution
+	if base_puzzle.map{|x| x>0?1:0}.sum==81
+		puts "solution" 
+		square_puzzle.each do |row|
+			p row
+		end
+		return 1
+	end
 
-def do_trivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,joined_puzzle)
+
+
+	# Create the sets of allowed numbers available for each space 
 	all_available_numbers = [*1..9]
-	allowed_numbers_in_space = joined_puzzle.dup
-	joined_puzzle.each_index do |nth_space|
-		if joined_puzzle[nth_space]<=0
+	allowed_numbers_in_space = base_puzzle.dup
+	base_puzzle.each_index do |nth_space|
+		if base_puzzle[nth_space]<=0
 			set_from_rank = sorted_by_rank[nth_space/9]
 			set_from_file = sorted_by_file[nth_space%9]
 			box_number = (nth_space/27)*3 + (nth_space%9)/3
 			set_from_box = sorted_by_box[box_number]
 			this_space_set = (((all_available_numbers - set_from_rank) - set_from_file) - set_from_box)
+			if this_space_set==[] 
+				return 0 
+			end
+			allowed_numbers_in_space[nth_space] = this_space_set
+		else
+			allowed_numbers_in_space[nth_space] = nth_space
 		end
-		if allowed_numbers_in_space[nth_space].class==Array && allowed_numbers_in_space[nth_space].size==1
-			trivial_solution=allowed_numbers_in_space[nth_space][0]
-			joined_puzzle[nth_space]=trivial_solution
-			puts "TRIVIAL STEP: add #{trivial_solution} in #{nth_space}th space"
+	end
+
+	# If none of the spaces have an obvious one step solution run the nontrivial method else trivial
+	if allowed_numbers_in_space.map{|x| x.size==1?1:0}.sum==0
+		# p allowed_numbers_in_space
+		do_nontrivial_solution(allowed_numbers_in_space,base_puzzle)
+	else
+		do_trivial_solution(allowed_numbers_in_space,base_puzzle)
+	end
+end
+
+def do_trivial_solution(allowed_numbers_in_space,joined_puzzle)
+	allowed_numbers_in_space.each_index do |nth_space|
+		if joined_puzzle[nth_space]==0 &&
+			allowed_numbers_in_space[nth_space].class==Array &&
+				allowed_numbers_in_space[nth_space].size==1
+					trivial_solution=allowed_numbers_in_space[nth_space][0]
+					joined_puzzle[nth_space]=trivial_solution
+					# puts "TRIVIAL STEP: add #{trivial_solution} in #{nth_space}th space"
+					break
 		end
 	end
 	find_next_state(joined_puzzle.flatten)
-	do_nontrivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,base_puzzle)
 end
 
-def do_nontrivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,joined_puzzle)
-	all_available_numbers = [*1..9]
-	allowed_numbers_in_space = joined_puzzle.dup
-	joined_puzzle.each_index do |nth_space|
-		if joined_puzzle[nth_space]<=0
-			set_from_rank = sorted_by_rank[nth_space/9]
-			set_from_file = sorted_by_file[nth_space%9]
-			box_number = (nth_space/27)*3 + (nth_space%9)/3
-			set_from_box = sorted_by_box[box_number]
-			this_space_set = (((all_available_numbers - set_from_rank) - set_from_file) - set_from_box)
-			allowed_numbers_in_space[nth_space] = this_space_set
-		end
-	end
-	puts "ran nontrivial"
+def do_nontrivial_solution(allowed_numbers_in_space,joined_puzzle)
+	# puts "ran nontrivial"
 	smallest_set = allowed_numbers_in_space.map { |x| 
 		x.class==Array ? x.size : 10
 	}.min
@@ -94,13 +97,14 @@ def do_nontrivial_solution(sorted_by_rank,sorted_by_file,sorted_by_box,joined_pu
 	# nontrivial_solution_counter=0
 	allowed_numbers_in_space.each_index do |nth_space|
 		this_space_solutions = allowed_numbers_in_space[nth_space]
-		if this_space_solutions.class==Array &&
-			this_space_solutions.size==smallest_set
-			this_space_solutions.each do |element_in_set|
-				joined_puzzle[nth_space]=element_in_set
-				puts "NONTRIVIAL STEP: add #{element_in_set} in #{nth_space}th space"
-				find_next_state(joined_puzzle.flatten)
-			end
+		if joined_puzzle[nth_space] ==0 &&
+			this_space_solutions.class==Array &&
+				this_space_solutions.size==smallest_set
+					this_space_solutions.each do |element_in_set|
+						joined_puzzle[nth_space]=element_in_set
+						# puts "NONTRIVIAL STEP: add #{element_in_set} in #{nth_space}th space"
+						find_next_state(joined_puzzle.flatten)
+					end
 		end
 		if this_space_solutions.size==smallest_set
 			break
@@ -110,7 +114,7 @@ end
 
 sudoku_solver([
 	[0,0,0,3,0,4,5,0,0],
-	[4,7,0,0,0,0,0,0,0],
+	[4,7,0,0,0,1,0,0,0],
 	[0,2,0,6,0,0,9,1,0],
 	[0,1,0,0,0,0,8,0,0],
 	[0,0,8,0,1,0,3,9,0],
@@ -119,6 +123,16 @@ sudoku_solver([
 	[0,0,0,0,0,0,2,0,7],
 	[1,0,0,0,0,0,0,8,0],
 ])
+# SAMPLE
+# [0,0,0,3,0,4,5,0,0],
+# [4,7,0,0,0,1,0,0,0],
+# [0,2,0,6,0,0,9,1,0],
+# [0,1,0,0,0,0,8,0,0],
+# [0,0,8,0,1,0,3,9,0],
+# [0,3,0,0,6,9,0,0,0],
+# [0,0,0,0,0,7,0,0,5],
+# [0,0,0,0,0,0,2,0,7],
+# [1,0,0,0,0,0,0,8,0],
 # SOLUTION
 # [9, 6, 1, 3, 2, 4, 5, 7, 8]
 # [4, 7, 5, 9, 8, 1, 6, 2, 3]
