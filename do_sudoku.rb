@@ -2,18 +2,18 @@ require_relative 'sudoku_helper_functions.rb'
 
 # Pass any unsolved sudoku puzzle as a parameter to solve_puzzle
 # Note: Proper sudokus have a single solution. This function will print 
-# 	all solutions for vague puzzles but there is an untested limit
+# all solutions for vague puzzles but there is an untested limit
 
 solve_puzzle([
-	[0,0,0,0,0,0,0,0,5],
-	[0,0,0,0,0,0,9,8,1],
-	[0,0,9,0,6,0,0,0,0],
-	[0,0,0,9,0,7,0,0,0],
-	[4,9,2,0,0,0,0,0,0],
-	[0,0,0,0,0,6,0,0,4],
-	[0,5,0,7,2,0,0,0,0],
-	[0,0,0,4,5,0,6,0,0],
-	[0,0,1,0,0,0,0,7,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,3,0,8,5],
+	[0,0,1,0,2,0,0,0,0],
+	[0,0,0,5,0,7,0,0,0],
+	[0,0,4,0,0,0,1,0,0],
+	[0,9,0,0,0,0,0,0,0],
+	[5,0,0,0,0,0,0,7,3],
+	[0,0,2,0,1,0,0,0,0],
+	[0,0,0,0,4,0,0,0,9],
 ])
 
 
